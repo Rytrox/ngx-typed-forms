@@ -11,6 +11,11 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
+    "paths": {
+      "ngx-typed-forms": [
+        "./dist/ngx-typed-forms"
+      ]
+    },
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
