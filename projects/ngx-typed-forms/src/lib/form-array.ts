@@ -21,43 +21,43 @@ export class FormArray<T> extends AngularFormArray<AbstractControl<T>> {
         super.validator = validatorFn;
     }
 
-    override set asyncValidator(asyncValidatorFn: AsyncValidatorFn<Array<T>> | null) {
+    public override set asyncValidator(asyncValidatorFn: AsyncValidatorFn<Array<T>> | null) {
         super.asyncValidator = asyncValidatorFn;
     }
 
-    override setValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[] | null) {
+    public override setValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[] | null) {
         super.setValidators(validators);
     }
 
-    override setAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[] | null) {
+    public override setAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[] | null) {
         super.setAsyncValidators(validators);
     }
 
-    override addValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[]) {
+    public override addValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[]) {
         super.addValidators(validators);
     }
 
-    override addAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[]) {
+    public override addAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[]) {
         super.addAsyncValidators(validators);
     }
 
-    override removeValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[]) {
+    public override removeValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[]) {
         super.removeValidators(validators);
     }
 
-    override removeAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[]) {
+    public override removeAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[]) {
         super.removeAsyncValidators(validators);
     }
 
-    override hasValidator(validator: ValidatorFn<Array<T>>): boolean {
+    public override hasValidator(validator: ValidatorFn<Array<T>>): boolean {
         return super.hasValidator(validator);
     }
 
-    override hasAsyncValidator(validator: AsyncValidatorFn<T>): boolean {
+    public override hasAsyncValidator(validator: AsyncValidatorFn<T>): boolean {
         return super.hasAsyncValidator(validator);
     }
 
-    override get(path: number): AbstractControl<T> | null {
+    public override get(path: number): AbstractControl<T> | null {
         return super.at(path) ?? null;
     }
 
