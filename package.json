@@ -1,5 +1,5 @@
 {
-  "name": "ngx-typed-forms",
+  "name": "@rytrox/ngx-typed-forms",
   "version": "18.0.0",
   "scripts": {
     "ng": "ng",

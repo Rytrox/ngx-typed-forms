@@ -2,13 +2,15 @@ import {FormControl as AngularFormControl, FormControlState} from "@angular/form
 import {AbstractControl, AbstractControlOptions} from "./abstract-control";
 import {AsyncValidatorFn, ValidatorFn} from "./validator";
 
-type FormControlOptions<T> = AbstractControlOptions<T>;
+interface FormControlOptions<T> extends AbstractControlOptions<T> {
+    nonNullable?: true;
+}
 
 export class FormControl<T = unknown> extends AngularFormControl<T | null> implements AbstractControl<T | null, T | null> {
 
     public constructor(
         value?: FormControlState<T | null> | T | null,
-        opts?: FormControlOptions<T | null> & { nonNullable?: true }
+        opts?: FormControlOptions<T | null>
     ) {
         super(value ?? null, opts);
     }
@@ -33,9 +35,6 @@ export class FormControl<T = unknown> extends AngularFormControl<T | null> imple
         super.addValidators(validators);
     }
 
-    public override addAsyncValidators(validators: AsyncValidatorFn<T | null> | AsyncValidatorFn<T | null>[]) {
-        super.addAsyncValidators(validators);
-    }
 
     public override removeValidators(validators: ValidatorFn<T | null> | ValidatorFn<T | null>[]) {
         super.removeValidators(validators);

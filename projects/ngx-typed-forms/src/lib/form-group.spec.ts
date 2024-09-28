@@ -1,4 +1,5 @@
 import {FormGroup} from './form-group';
+import {FormGroup as AngularFormGroup} from '@angular/forms';
 import {FormControl} from "./form-control";
 import {Validators} from "@angular/forms";
 
@@ -13,7 +14,7 @@ interface Bar {
     parent: string
 }
 
-class BarGroup extends FormGroup<Bar> {
+class BarGroup extends FormGroup<Bar | undefined> {
 
     constructor(original?: Bar) {
         super({
@@ -50,6 +51,15 @@ describe('JuniorJobFormGroup', () => {
         });
 
         group.get('bar')?.disable();
+
+        const angularGroup = new AngularFormGroup({
+            name: new FormControl('Test', { validators: [ Validators.required ] }),
+            id: new FormControl(1),
+            date: new FormControl(new Date()),
+            bar: new BarGroup()
+        });
+
+        const angularRaw = angularGroup.value;
 
         const rawVal = group.value;
         expect(group.get('date')?.value).toBe(rawVal.date);

@@ -1,4 +1,7 @@
-import {AbstractControl as AngularAbstractControl, AbstractControlOptions as AngularAbstractControlOptions} from "@angular/forms";
+import {
+    AbstractControl as AngularAbstractControl,
+    AbstractControlOptions as AngularAbstractControlOptions,
+} from "@angular/forms";
 import {AsyncValidatorFn, ValidatorFn} from "./validator";
 
 export interface AbstractControlOptions<T, R extends T = T> extends AngularAbstractControlOptions {
@@ -26,4 +29,7 @@ export interface AbstractControl<V = unknown, R extends V = V> extends AngularAb
     hasValidator(validator: ValidatorFn<V, R>): boolean;
 
     hasAsyncValidator(validator: AsyncValidatorFn<V, R>): boolean;
+
+    setValue(value: R, options?: Object): void;
+
 }
