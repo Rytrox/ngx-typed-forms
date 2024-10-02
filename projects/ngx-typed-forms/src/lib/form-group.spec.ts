@@ -1,22 +1,22 @@
-import {FormGroup} from './form-group';
+import {FormGroup, FormGroupValue, OptionalKeys} from './form-group';
 import {FormGroup as AngularFormGroup} from '@angular/forms';
 import {FormControl} from "./form-control";
 import {Validators} from "@angular/forms";
 
 interface Foo {
-    name: string,
-    id: number,
-    date: Date,
-    bar?: Bar
+    name: FormControl<string>,
+    id: FormControl<number>,
+    date: FormControl<Date>,
+    bar?: BarGroup
 }
 
 interface Bar {
-    parent: string
+    parent: FormControl<string>;
 }
 
-class BarGroup extends FormGroup<Bar | undefined> {
+class BarGroup extends FormGroup<Bar> {
 
-    constructor(original?: Bar) {
+    constructor(original?: FormGroupValue<Bar>) {
         super({
             parent: new FormControl(original?.parent)
         });
@@ -26,7 +26,7 @@ class BarGroup extends FormGroup<Bar | undefined> {
 
 class FooGroup extends FormGroup<Foo> {
 
-    constructor(private original: Foo) {
+    constructor(original: FormGroupValue<Foo>) {
         super({
             name: new FormControl(original.name, { validators: [ Validators.required ] }),
             id: new FormControl(original.id),
@@ -61,8 +61,8 @@ describe('JuniorJobFormGroup', () => {
 
         const angularRaw = angularGroup.value;
 
-        const rawVal = group.value;
-        expect(group.get('date')?.value).toBe(rawVal.date);
+        const rawVal = group.getRawValue();
+        expect(group.controls.date.value).toEqual(rawVal.date ?? null);
         expect(rawVal.bar).toBeUndefined();
 
         group.setValue(group.getRawValue());
@@ -79,7 +79,7 @@ describe('JuniorJobFormGroup', () => {
         const date = group.controls.date.value;
         expect(date).toBeInstanceOf(Date);
 
-        const bar = group.controls.bar.value;
+        const bar = group.controls.bar?.value;
         expect(bar).toEqual({ parent: 'Hello' });
 
         const name = group.controls.name.value;
@@ -89,4 +89,14 @@ describe('JuniorJobFormGroup', () => {
         expect(id).toBe(1);
     });
 
+    it('should register new controls', () => {
+        const group = new FooGroup({
+            id: 1,
+            name: 'Test',
+            date: new Date(),
+            bar: { parent: 'Hello' }
+        });
+
+        group.registerControl('bar', new BarGroup({parent: 'Hello'}));
+    });
 });

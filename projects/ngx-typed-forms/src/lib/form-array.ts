@@ -1,93 +1,88 @@
-import {AbstractControlOptions, FormArray as AngularFormArray} from "@angular/forms";
+import {
+    FormArray as AngularFormArray,
+    AbstractControlOptions as AngularAbstractControlOptions,
+} from "@angular/forms";
+import {ArrayValidatorFn, AsyncArrayValidatorFn} from "./validator";
+import {FormControl} from "./form-control";
+import {FormGroup, FormGroupRawValue, FormGroupValue} from "./form-group";
 import {AbstractControl} from "./abstract-control";
-import {AsyncValidatorFn, ValidatorFn} from "./validator";
-import {Observable} from "rxjs";
 
-export class FormArray<T> extends AngularFormArray<AbstractControl<T>> {
+export type FormArrayValue<C extends AbstractControl<any>> = Array<
+    NonNullable<C> extends FormGroup<infer U> ?
+        FormGroupValue<U> :
+        NonNullable<C> extends FormControl<infer U> ?
+            U | null :
+            NonNullable<C> extends FormArray<infer U> ?
+                FormArrayValue<U> :
+                C['value']
+>;
 
-    public declare readonly controls: Array<AbstractControl<T>>;
-    public declare readonly value: Array<T>;
-    public declare readonly valueChanges: Observable<Array<T>>;
+export type FormArrayRawValue<C extends AbstractControl<any>> = Array<
+    NonNullable<C> extends FormGroup<infer U> ?
+        FormGroupRawValue<U> :
+        NonNullable<C> extends FormControl<infer U> ?
+            U | null :
+            NonNullable<C> extends FormArray<infer U> ?
+                FormArrayRawValue<U> :
+                C['setValue'] extends (c: infer U) => void ? U : never
+>;
+
+export interface FormArrayControlType<C extends AbstractControl<any>> extends AngularAbstractControlOptions {
+    validators?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | null;
+    asyncValidators?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null;
+}
+
+export class FormArray<C extends AbstractControl> extends AngularFormArray<C> {
 
     public constructor(
-        controls: Array<AbstractControl<T>>,
-        validatorOrOpts?: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[] | AbstractControlOptions | null,
-        asyncValidator?: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[] | null
+        controls: Array<C>,
+        validatorOrOpts?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | FormArrayControlType<C> | null,
+        asyncValidator?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null
     ) {
         super(controls, validatorOrOpts, asyncValidator);
     }
 
-    public override set validator(validatorFn: ValidatorFn<Array<T>> | null) {
+    public get rawValue(): FormArrayRawValue<C> {
+        return this.getRawValue() as FormArrayRawValue<C>;
+    }
+
+    public override set validator(validatorFn: ArrayValidatorFn<C> | null) {
         super.validator = validatorFn;
     }
 
-    public override set asyncValidator(asyncValidatorFn: AsyncValidatorFn<Array<T>> | null) {
+    public override set asyncValidator(asyncValidatorFn: AsyncArrayValidatorFn<C> | null) {
         super.asyncValidator = asyncValidatorFn;
     }
 
-    public override setValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[] | null) {
+    public override setValidators(validators: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | null) {
         super.setValidators(validators);
     }
 
-    public override setAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[] | null) {
+    public override setAsyncValidators(validators: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null) {
         super.setAsyncValidators(validators);
     }
 
-    public override addValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[]) {
+    public override addValidators(validators: ArrayValidatorFn<C> | ArrayValidatorFn<C>[]) {
         super.addValidators(validators);
     }
 
-    public override addAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[]) {
+    public override addAsyncValidators(validators: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[]) {
         super.addAsyncValidators(validators);
     }
 
-    public override removeValidators(validators: ValidatorFn<Array<T>> | ValidatorFn<Array<T>>[]) {
+    public override removeValidators(validators: ArrayValidatorFn<C> | ArrayValidatorFn<C>[]) {
         super.removeValidators(validators);
     }
 
-    public override removeAsyncValidators(validators: AsyncValidatorFn<Array<T>> | AsyncValidatorFn<Array<T>>[]) {
+    public override removeAsyncValidators(validators: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[]) {
         super.removeAsyncValidators(validators);
     }
 
-    public override hasValidator(validator: ValidatorFn<Array<T>>): boolean {
+    public override hasValidator(validator: ArrayValidatorFn<C>): boolean {
         return super.hasValidator(validator);
     }
 
-    public override hasAsyncValidator(validator: AsyncValidatorFn<T>): boolean {
+    public override hasAsyncValidator(validator: AsyncArrayValidatorFn<C>): boolean {
         return super.hasAsyncValidator(validator);
-    }
-
-    public override get(path: number): AbstractControl<T> | null {
-        return super.at(path) ?? null;
-    }
-
-    // IDK what to say anymore... see Angulars own docs...
-    // @ts-ignore
-    public override at(index: number): AbstractControl<T> | undefined {
-        return super.at(index);
-    }
-
-    public override push(control: AbstractControl<T>, options?: { emitEvent?: boolean }) {
-        super.push(control, options);
-    }
-
-    public override insert(index: number, control: AbstractControl<T>, options?: { emitEvent?: boolean }) {
-        super.insert(index, control, options);
-    }
-
-    public override setControl(index: number, control: AbstractControl<T>, options?: { emitEvent?: boolean }) {
-        super.setControl(index, control, options);
-    }
-
-    public override setValue(value: Array<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        super.setValue(value as Array<any>, options);
-    }
-
-    public override patchValue(value: Array<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        super.patchValue(value, options);
-    }
-
-    public override getRawValue(): Array<T> {
-        return super.getRawValue();
     }
 }
