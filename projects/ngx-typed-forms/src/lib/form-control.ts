@@ -1,18 +1,22 @@
 import {FormControl as AngularFormControl, FormControlState} from "@angular/forms";
-import {AbstractControl, AbstractControlOptions} from "./abstract-control";
+import {AbstractControlOptions} from "./abstract-control";
 import {AsyncValidatorFn, ValidatorFn} from "./validator";
 
 interface FormControlOptions<T> extends AbstractControlOptions<T> {
     nonNullable?: true;
 }
 
-export class FormControl<T = unknown> extends AngularFormControl<T | null> implements AbstractControl<T | null, T | null> {
+export class FormControl<T = unknown> extends AngularFormControl<T | null> {
 
     public constructor(
         value?: FormControlState<T | null> | T | null,
         opts?: FormControlOptions<T | null>
     ) {
         super(value ?? null, opts);
+    }
+
+    public get rawValue(): T | null {
+        return this.getRawValue();
     }
 
     public override set validator(validatorFn: ValidatorFn<T | null> | null) {

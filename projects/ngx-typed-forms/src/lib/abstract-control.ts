@@ -13,6 +13,7 @@ export interface AbstractControl<V = unknown, R extends V = V> extends AngularAb
 
     asyncValidator: AsyncValidatorFn<V, R> | null;
     validator: ValidatorFn<V, R> | null;
+    readonly rawValue: R;
 
     setValidators(validators: ValidatorFn<V, R> | ValidatorFn<V, R>[] | null): void;
 
