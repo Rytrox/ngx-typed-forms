@@ -1,6 +1,6 @@
 {
     "name": "@rytrox/ngx-typed-forms",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
@@ -42,5 +42,15 @@
         "ng-packagr": "^18.2.0",
         "typescript": "~5.5.2",
         "typescript-eslint": "8.2.0"
-    }
+    },
+    "keywords": [
+        "angular",
+        "angular18",
+        "forms",
+        "ng",
+        "ng18",
+        "ngx",
+        "type",
+        "strict"
+    ]
 }
