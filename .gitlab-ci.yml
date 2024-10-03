@@ -1,0 +1,44 @@
+stages:
+  - test
+  - build
+  - publish
+
+Lint:
+  stage: test
+  image: trion/ng-cli:18.2.6
+  before_script:
+    - npm install
+  script:
+    - npm run lint
+
+Test Build:
+  stage: test
+  image: trion/ng-cli-karma:18.2.6
+  before_script:
+    - npm install
+  script:
+    - npm run build
+
+Build:
+  stage: build
+  image: trion/ng-cli:18.2.6
+  before_script:
+    - npm install
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/ngx-typed-forms
+    expire_in: 1 week
+
+Publish:
+  stage: publish
+  image: trion/ng-cli:18.2.6
+  needs:
+    - Build
+  when: manual
+  before_script:
+    - echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
+  script:
+    - cd dist/quill-emoji-mart
+    - npm publish --access public

@@ -7,7 +7,7 @@ import {FormControl} from "./form-control";
 import {FormGroup, FormGroupRawValue, FormGroupValue} from "./form-group";
 import {AbstractControl} from "./abstract-control";
 
-export type FormArrayValue<C extends AbstractControl<any>> = Array<
+export type FormArrayValue<C extends AbstractControl<any>> = [
     NonNullable<C> extends FormGroup<infer U> ?
         FormGroupValue<U> :
         NonNullable<C> extends FormControl<infer U> ?
@@ -15,9 +15,9 @@ export type FormArrayValue<C extends AbstractControl<any>> = Array<
             NonNullable<C> extends FormArray<infer U> ?
                 FormArrayValue<U> :
                 C['value']
->;
+];
 
-export type FormArrayRawValue<C extends AbstractControl<any>> = Array<
+export type FormArrayRawValue<C extends AbstractControl<any>> = [
     NonNullable<C> extends FormGroup<infer U> ?
         FormGroupRawValue<U> :
         NonNullable<C> extends FormControl<infer U> ?
@@ -25,17 +25,17 @@ export type FormArrayRawValue<C extends AbstractControl<any>> = Array<
             NonNullable<C> extends FormArray<infer U> ?
                 FormArrayRawValue<U> :
                 C['setValue'] extends (c: infer U) => void ? U : never
->;
+];
 
 export interface FormArrayControlType<C extends AbstractControl<any>> extends AngularAbstractControlOptions {
     validators?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | null;
     asyncValidators?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null;
 }
 
-export class FormArray<C extends AbstractControl> extends AngularFormArray<C> {
+export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<C> {
 
     public constructor(
-        controls: Array<C>,
+        controls: C[],
         validatorOrOpts?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | FormArrayControlType<C> | null,
         asyncValidator?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null
     ) {

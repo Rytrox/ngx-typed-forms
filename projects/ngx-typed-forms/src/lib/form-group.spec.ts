@@ -1,5 +1,4 @@
-import {FormGroup, FormGroupValue, OptionalKeys} from './form-group';
-import {FormGroup as AngularFormGroup} from '@angular/forms';
+import {FormGroup, FormGroupValue} from './form-group';
 import {FormControl} from "./form-control";
 import {Validators} from "@angular/forms";
 
@@ -52,18 +51,19 @@ describe('JuniorJobFormGroup', () => {
 
         group.get('bar')?.disable();
 
-        const angularGroup = new AngularFormGroup({
-            name: new FormControl('Test', { validators: [ Validators.required ] }),
-            id: new FormControl(1),
-            date: new FormControl(new Date()),
-            bar: new BarGroup()
-        });
-
-        const angularRaw = angularGroup.value;
+        // const angularGroup = new AngularFormGroup({
+        //     name: new FormControl('Test', { validators: [ Validators.required ] }),
+        //     id: new FormControl(1),
+        //     date: new FormControl(new Date()),
+        //     bar: new BarGroup()
+        // });
+        //
+        // const angularRaw = angularGroup.value;
 
         const rawVal = group.getRawValue();
         expect(group.controls.date.value).toEqual(rawVal.date ?? null);
-        expect(rawVal.bar).toBeUndefined();
+        expect(group.value.bar).toBeUndefined();
+        expect(rawVal.bar).not.toBeUndefined();
 
         group.setValue(group.getRawValue());
     });

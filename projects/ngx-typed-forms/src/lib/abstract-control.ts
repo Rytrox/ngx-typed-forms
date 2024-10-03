@@ -31,6 +31,6 @@ export interface AbstractControl<V = unknown, R extends V = V> extends AngularAb
 
     hasAsyncValidator(validator: AsyncValidatorFn<V, R>): boolean;
 
-    setValue(value: R, options?: Object): void;
+    setValue(value: R, options?: object): void;
 
 }

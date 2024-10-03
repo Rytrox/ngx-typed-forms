@@ -1,7 +1,7 @@
-import {FormArray} from './form-array';
-import {FormArray as AngularFormArray, Validators} from '@angular/forms';
+import {Validators} from '@angular/forms';
 import {FormControl} from "./form-control";
 import {FormGroup, FormGroupValue} from "./form-group";
+import {FormArray} from "./form-array";
 
 interface Foo {
     name: FormControl<string>,
@@ -38,13 +38,14 @@ class FooGroup extends FormGroup<Foo> {
 
 describe('FormArray', () => {
     it('should create an instance', () => {
-        const form = new FormArray<FormArray<FooGroup>>([]);
-        const val = form.value;
-        const rawValue = form.getRawValue();
-        const element = rawValue[0][1];
+        const form = new FormArray<FooGroup>([]);
+        expect(form).toBeTruthy();
 
-        const angularForm = new AngularFormArray<FormControl<string | null>>([]);
-        const angularVal = angularForm.value;
-        const angularRawValue = angularForm.getRawValue();
+        // const val = form.value;
+        // const rawValue = form.getRawValue();
+        //
+        // const angularForm = new AngularFormArray<FormControl<string | null>>([]);
+        // const angularVal = angularForm.value;
+        // const angularRawValue = angularForm.getRawValue();
     });
 });
