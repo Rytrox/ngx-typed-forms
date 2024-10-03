@@ -40,5 +40,5 @@ Publish:
   before_script:
     - echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
   script:
-    - cd dist/quill-emoji-mart
+    - cd dist/ngx-typed-forms
     - npm publish --access public

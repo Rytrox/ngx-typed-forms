@@ -10,7 +10,7 @@
         "test:ci": "ng test --code-coverage --watch false",
         "lint": "ng lint"
     },
-    "private": true,
+    "private": false,
     "dependencies": {
         "@angular/animations": "^18.2.0",
         "@angular/common": "^18.2.0",
