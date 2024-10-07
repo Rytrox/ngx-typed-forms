@@ -1,6 +1,6 @@
 {
     "name": "@rytrox/ngx-typed-forms",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "peerDependencies": {
         "@angular/common": "^18.2.0",
         "@angular/core": "^18.2.0",
@@ -10,6 +10,10 @@
         "tslib": "^2.3.0"
     },
     "sideEffects": false,
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Rytrox/ngx-typed-forms.git"
+    },
     "license": "MIT",
     "keywords": [
         "angular",
