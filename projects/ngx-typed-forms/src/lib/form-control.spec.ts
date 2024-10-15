@@ -1,5 +1,5 @@
 import {FormControl} from './form-control';
-import {Validators, FormControl as AngularFormControl} from "@angular/forms";
+import {Validators} from "@angular/forms";
 
 describe('FormControl', () => {
     it('should create an unknown instance', () => {
