@@ -4,14 +4,14 @@ import {FormGroup, FormGroupValue} from "./form-group";
 import {FormArray} from "./form-array";
 
 interface Foo {
-    name: FormControl<string>,
-    id: FormControl<number>,
-    date: FormControl<Date>,
+    name: FormControl<string | null>,
+    id: FormControl<number | null>,
+    date: FormControl<Date | null>,
     bar?: BarGroup
 }
 
 interface Bar {
-    parent: FormControl<string>;
+    parent: FormControl<string | null>;
 }
 
 class BarGroup extends FormGroup<Bar> {

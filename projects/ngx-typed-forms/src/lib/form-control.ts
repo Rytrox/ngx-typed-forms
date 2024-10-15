@@ -1,62 +1,137 @@
-import {FormControl as AngularFormControl, FormControlState} from "@angular/forms";
-import {AbstractControlOptions} from "./abstract-control";
+import {
+    FormControl as AngularFormControl,
+    FormControlOptions as AngularFormControlOptions,
+    FormControlState as AngularFormControlState
+} from "@angular/forms";
+import {AbstractControl, AbstractControlOptions} from "./abstract-control";
 import {AsyncValidatorFn, ValidatorFn} from "./validator";
 
-interface FormControlOptions<T> extends AbstractControlOptions<T> {
-    nonNullable?: true;
+export interface FormControlState<T> {
+    disabled?: boolean;
+    value: T;
 }
 
-export class FormControl<T = unknown> extends AngularFormControl<T | null> {
+export interface NonNullableFormControlState<T> {
+    disabled?: boolean;
+    nonNullable: true;
+    value: Defined<T>;
+}
 
-    public constructor(
-        value?: FormControlState<T | null> | T | null,
-        opts?: FormControlOptions<T | null>
+type FormControlOptions<T> = AbstractControlOptions<T>;
+
+type Defined<T> = Exclude<T, undefined>;
+
+export interface FormControl<T> extends AbstractControl<T> {
+
+    rawValue: T;
+
+    setValidators(validators: ValidatorFn<T> | ValidatorFn<T>[] | null): void;
+
+    setAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[] | null): void;
+
+    addValidators(validators: ValidatorFn<T> | ValidatorFn<T>[]): void;
+
+    addAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[]): void;
+
+    removeValidators(validators: ValidatorFn<T> | ValidatorFn<T>[]): void;
+
+    removeAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[]): void;
+
+    hasValidator(validator: ValidatorFn<T>): boolean;
+
+    hasAsyncValidator(validator: AsyncValidatorFn<T>): boolean;
+}
+
+type IFormControl<T> = FormControl<T>;
+export const FormControl: FormControlConstructors = class FormControl<T = unknown> extends AngularFormControl implements IFormControl<T> {
+
+    constructor(
+        // formState and defaultValue will only be null if T is nullable
+        formState: FormControlState<T> | T = null as T,
+        opts?: FormControlOptions<T> | null,
     ) {
-        super(value ?? null, opts);
+        super(convertState(formState), convertOpts(formState, opts));
     }
 
-    public get rawValue(): T | null {
+    public get rawValue(): T {
         return this.getRawValue();
     }
+};
 
-    public override set validator(validatorFn: ValidatorFn<T | null> | null) {
-        super.validator = validatorFn;
+const convertState = <T> (state: FormControlState<T> | T): AngularFormControlState<T> => {
+    if (isFormControlState(state)) {
+        return {
+            value: state.value,
+            disabled: !!state.disabled
+        };
     }
 
-    public override set asyncValidator(asyncValidatorFn: AsyncValidatorFn<T | null> | null) {
-        super.asyncValidator = asyncValidatorFn;
+    return {
+        value: state,
+        disabled: false
+    };
+}
+
+const convertOpts = <T> (state: FormControlState<T> | T, options: FormControlOptions<T> | undefined | null): AngularFormControlOptions | undefined | null => {
+    // check for non-nullable and move it back
+    if (!!state && typeof state === 'object' && 'nonNullable' in state && typeof state.nonNullable === 'boolean') {
+        return {
+            ...options,
+            nonNullable: state.nonNullable
+        };
     }
 
-    public override setValidators(validators: ValidatorFn<T | null> | ValidatorFn<T | null>[] | null) {
-        super.setValidators(validators);
-    }
+    return options;
+}
 
-    public override setAsyncValidators(validators: AsyncValidatorFn<T | null> | AsyncValidatorFn<T | null>[] | null) {
-        super.setAsyncValidators(validators);
-    }
+const isFormControlState = <T> (val: FormControlState<T> | T): val is FormControlState<T> => {
+    return !!val && typeof val === 'object' && 'value' in val &&
+        (('disabled' in val && typeof val.disabled === 'boolean') || !('disabled' in val));
+}
 
-    public override addValidators(validators: ValidatorFn<T | null> | ValidatorFn<T | null>[]) {
-        super.addValidators(validators);
-    }
+declare interface FormControlConstructors {
+    /**
+     * Construct a FormControl with no initial value or validators.
+     */
+    new (): FormControl<unknown>;
 
 
-    public override removeValidators(validators: ValidatorFn<T | null> | ValidatorFn<T | null>[]) {
-        super.removeValidators(validators);
-    }
+    /**
+     * Creates a new non-nullable `FormControl` instance.
+     *
+     * @param state Initializes the control with an initial value,
+     * or an object that defines the initial value and disabled state.
+     *
+     * @param options A synchronous validator function, or an array of
+     * such functions, or a `FormControlOptions` object that contains validation functions
+     * and a validation trigger.
+     *
+     */
+    new <T extends Defined<any> = Defined<unknown>>(
+        state: NonNullableFormControlState<T>,
+        options?: FormControlOptions<NonNullable<T>>
+    ): FormControl<NonNullable<T>>;
 
-    public override removeAsyncValidators(validators: AsyncValidatorFn<T | null> | AsyncValidatorFn<T | null>[]) {
-        super.removeAsyncValidators(validators);
-    }
+    /**
+     * Creates a new nullable `FormControl` instance.
+     *
+     * @param state Initializes the control with an initial value,
+     * or an object that defines the initial value and disabled state.
+     *
+     * @param options A synchronous validator function, or an array of
+     * such functions, or a `FormControlOptions` object that contains validation functions
+     * and a validation trigger.
+     *
+     */
+    new <T extends Defined<any> = Defined<unknown>>(
+        state: FormControlState<T | null> | T | undefined,
+        options?: FormControlOptions<Defined<T> | null>
+    ): FormControl<Defined<T> | null>;
 
-    public override hasValidator(validator: ValidatorFn<T | null>): boolean {
-        return super.hasValidator(validator);
-    }
 
-    public override hasAsyncValidator(validator: AsyncValidatorFn<T | null>): boolean {
-        return super.hasAsyncValidator(validator);
-    }
-
-    public override registerOnChange(fn: (_: T | null) => void): void {
-        super.registerOnChange(fn);
-    }
+    /**
+     * The presence of an explicit `prototype` property provides backwards-compatibility for apps that
+     * manually inspect the prototype chain.
+     */
+    prototype: FormControl<unknown>;
 }
