@@ -20,7 +20,7 @@ export type FormGroupValue<C extends {[K in keyof C]: AbstractControl<any>}> = {
 };
 
 export type FormGroupRawValue<C extends {[K in keyof C]: AbstractControl<any>}> = {
-    [K in keyof C]?: NonNullable<C[K]> extends FormGroup<infer U> ?
+    [K in keyof C]: NonNullable<C[K]> extends FormGroup<infer U> ?
         FormGroupRawValue<U> :
         NonNullable<C[K]> extends FormControl<infer U> ?
             Exclude<U, null> :
@@ -31,6 +31,8 @@ export type FormGroupRawValue<C extends {[K in keyof C]: AbstractControl<any>}> 
 
 export class FormGroup<C extends {[K in keyof C]: AbstractControl<any>}> extends AngularFormGroup<C> {
 
+    public declare readonly controls: {[K in keyof C]: C[K]};
+
     public constructor(
         controls: C,
         validatorOrOpts?: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[] | AbstractControlOptions<FormGroupValue<C>, FormGroupRawValue<C>> | null,
@@ -40,7 +42,8 @@ export class FormGroup<C extends {[K in keyof C]: AbstractControl<any>}> extends
     }
 
     public get rawValue(): FormGroupRawValue<C> {
-        return this.getRawValue();
+        // This is correct since the raw value includes all disabled controls, and you are not able to remove any non-optional controls anymore
+        return this.getRawValue() as FormGroupRawValue<C>;
     }
 
     public override set validator(validatorFn: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | null) {
@@ -59,19 +62,19 @@ export class FormGroup<C extends {[K in keyof C]: AbstractControl<any>}> extends
         super.setAsyncValidators(validators);
     }
 
-    public override addValidators(validators: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
+    public override addValidators(...validators: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
         super.addValidators(validators);
     }
 
-    public override addAsyncValidators(validators: AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
+    public override addAsyncValidators(...validators: AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
         super.addAsyncValidators(validators);
     }
 
-    public override removeValidators(validators: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
+    public override removeValidators(...validators: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
         super.removeValidators(validators);
     }
 
-    public override removeAsyncValidators(validators: AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
+    public override removeAsyncValidators(...validators: AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]) {
         super.removeAsyncValidators(validators);
     }
 

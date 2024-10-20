@@ -29,13 +29,13 @@ export interface FormControl<T> extends AbstractControl<T> {
 
     setAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[] | null): void;
 
-    addValidators(validators: ValidatorFn<T> | ValidatorFn<T>[]): void;
+    addValidators(...validators: ValidatorFn<T>[]): void;
 
-    addAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[]): void;
+    addAsyncValidators(...validators: AsyncValidatorFn<T>[]): void;
 
-    removeValidators(validators: ValidatorFn<T> | ValidatorFn<T>[]): void;
+    removeValidators(...validators: ValidatorFn<T>[]): void;
 
-    removeAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[]): void;
+    removeAsyncValidators(...validators: AsyncValidatorFn<T>[]): void;
 
     hasValidator(validator: ValidatorFn<T>): boolean;
 

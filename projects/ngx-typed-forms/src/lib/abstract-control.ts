@@ -19,13 +19,13 @@ export interface AbstractControl<V = unknown, R extends V = V> extends AngularAb
 
     setAsyncValidators(validators: AsyncValidatorFn<V, R> | AsyncValidatorFn<V, R>[] | null): void;
 
-    addValidators(validators: ValidatorFn<V, R> | ValidatorFn<V, R>[]): void;
+    addValidators(...validators: ValidatorFn<V, R>[]): void;
 
-    addAsyncValidators(validators: AsyncValidatorFn<V, R> | AsyncValidatorFn<V, R>[]): void;
+    addAsyncValidators(...validators: AsyncValidatorFn<V, R>[]): void;
 
-    removeValidators(validators: ValidatorFn<V, R> | ValidatorFn<V, R>[]): void;
+    removeValidators(...validators: ValidatorFn<V, R>[]): void;
 
-    removeAsyncValidators(validators: AsyncValidatorFn<V, R> | AsyncValidatorFn<V, R>[]): void;
+    removeAsyncValidators(...validators: AsyncValidatorFn<V, R>[]): void;
 
     hasValidator(validator: ValidatorFn<V, R>): boolean;
 
