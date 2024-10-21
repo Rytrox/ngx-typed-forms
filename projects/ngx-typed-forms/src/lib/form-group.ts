@@ -1,49 +1,51 @@
 import {FormGroup as AngularFormGroup} from '@angular/forms';
-import {AbstractControl, AbstractControlOptions} from "./abstract-control";
+import {
+    AbstractControl,
+    AbstractControlOptions,
+    AbstractControlRawValue,
+    AbstractControlValue
+} from "./abstract-control";
 import {AsyncValidatorFn, ValidatorFn} from "./validator";
-import {FormControl} from "./form-control";
-import {FormArray, FormArrayRawValue, FormArrayValue} from "./form-array";
+import {Observable} from "rxjs";
 
 // Select only Optional Keys
 export type OptionalKeys<T> = {
     [K in keyof T]-?: undefined extends T[K] ? K : never;
 }[keyof T];
 
-export type FormGroupValue<C extends {[K in keyof C]: AbstractControl<any>}> = {
-    [K in keyof C]?: NonNullable<C[K]> extends FormGroup<infer U> ?
-        FormGroupValue<U> :
-        NonNullable<C[K]> extends FormControl<infer U> ?
-            U | null :
-            NonNullable<C[K]> extends FormArray<infer U> ?
-                FormArrayValue<U> :
-                C[K]['value']
-};
+export type FormGroupValue<C extends {[K in keyof C]: AbstractControl<any>}> = Partial<{
+    [K in keyof C]: AbstractControlValue<C[K]>;
+}>;
 
 export type FormGroupRawValue<C extends {[K in keyof C]: AbstractControl<any>}> = {
-    [K in keyof C]: NonNullable<C[K]> extends FormGroup<infer U> ?
-        FormGroupRawValue<U> :
-        NonNullable<C[K]> extends FormControl<infer U> ?
-            Exclude<U, null> :
-            NonNullable<C[K]> extends FormArray<infer U> ?
-                FormArrayRawValue<U> :
-                C[K]['getRawValue']
+    [K in keyof C]: AbstractControlRawValue<C[K]>
 };
 
-export class FormGroup<C extends {[K in keyof C]: AbstractControl<any>}> extends AngularFormGroup<C> {
+export class FormGroup<C extends {[K in keyof C]: AbstractControl<any>}> extends AngularFormGroup<C> implements AbstractControl<FormGroupValue<C>, FormGroupRawValue<C>> {
 
     public declare readonly controls: {[K in keyof C]: C[K]};
+    public declare readonly value: FormGroupValue<C>;
+    public declare readonly valueChanges: Observable<FormGroupValue<C>>;
 
     public constructor(
         controls: C,
-        validatorOrOpts?: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[] | AbstractControlOptions<FormGroupValue<C>, FormGroupRawValue<C>> | null,
-        asyncValidator?: AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[] | null
+        validatorOrOpts?: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[] | AbstractControlOptions<FormGroupValue<C>, FormGroupRawValue<C>>,
+        asyncValidator?: AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | AsyncValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>>[]
     ) {
         super(controls, validatorOrOpts, asyncValidator);
     }
 
     public get rawValue(): FormGroupRawValue<C> {
-        // This is correct since the raw value includes all disabled controls, and you are not able to remove any non-optional controls anymore
-        return this.getRawValue() as FormGroupRawValue<C>;
+        return this.getRawValue();
+    }
+
+    // This is correct since the raw value includes all disabled controls, and you are not able to remove any non-optional controls anymore
+    public override getRawValue(): FormGroupRawValue<C> {
+        return super.getRawValue() as FormGroupRawValue<C>;
+    }
+
+    public override setValue(value: FormGroupRawValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
+        super.setValue(value, options);
     }
 
     public override set validator(validatorFn: ValidatorFn<FormGroupValue<C>, FormGroupRawValue<C>> | null) {

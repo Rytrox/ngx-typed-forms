@@ -9,6 +9,14 @@ export interface AbstractControlOptions<T, R extends T = T> extends AngularAbstr
     asyncValidators?: AsyncValidatorFn<T, R> | AsyncValidatorFn<T, R>[] | null;
 }
 
+export declare type AbstractControlRawValue<T extends AbstractControl | undefined> =
+    T extends AngularAbstractControl<any, any> ?
+        T['setValue'] extends (v: infer R) => void ? R : never :
+        never;
+
+export declare type AbstractControlValue<T extends AbstractControl | undefined> =
+    T extends AbstractControl<any, any> ? T['value'] : never;
+
 export interface AbstractControl<V = unknown, R extends V = V> extends AngularAbstractControl<V, R> {
 
     asyncValidator: AsyncValidatorFn<V, R> | null;

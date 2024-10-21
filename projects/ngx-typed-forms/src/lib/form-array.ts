@@ -1,38 +1,26 @@
 import {
     FormArray as AngularFormArray,
-    AbstractControlOptions as AngularAbstractControlOptions,
+    AbstractControlOptions as AngularAbstractControlOptions
 } from "@angular/forms";
 import {ArrayValidatorFn, AsyncArrayValidatorFn} from "./validator";
-import {FormControl} from "./form-control";
-import {FormGroup, FormGroupRawValue, FormGroupValue} from "./form-group";
-import {AbstractControl} from "./abstract-control";
+import {AbstractControl, AbstractControlRawValue, AbstractControlValue} from "./abstract-control";
+import {Observable} from "rxjs";
 
-export type FormArrayValue<C extends AbstractControl<any>> = [
-    NonNullable<C> extends FormGroup<infer U> ?
-        FormGroupValue<U> :
-        NonNullable<C> extends FormControl<infer U> ?
-            U | null :
-            NonNullable<C> extends FormArray<infer U> ?
-                FormArrayValue<U> :
-                C['value']
-];
+export type FormArrayValue<C extends AbstractControl<any>> = AbstractControlValue<C>[];
 
-export type FormArrayRawValue<C extends AbstractControl<any>> = [
-    NonNullable<C> extends FormGroup<infer U> ?
-        FormGroupRawValue<U> :
-        NonNullable<C> extends FormControl<infer U> ?
-            U | null :
-            NonNullable<C> extends FormArray<infer U> ?
-                FormArrayRawValue<U> :
-                C['setValue'] extends (c: infer U) => void ? U : never
-];
+export type FormArrayRawValue<C extends AbstractControl<any>> = AbstractControlRawValue<C>[];
 
 export interface FormArrayControlType<C extends AbstractControl<any>> extends AngularAbstractControlOptions {
     validators?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | null;
     asyncValidators?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null;
 }
 
-export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<C> {
+// @ts-expect-error This is correct, because Array<V> does not extend Array<R>, but this needs to work here, since Angular is designed to do this.
+export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<C> implements AbstractControl<FormArrayValue<C>, FormArrayRawValue<C>> {
+
+    public declare readonly controls: C[];
+    public declare readonly value: FormArrayValue<C>;
+    public declare readonly valueChanges: Observable<FormArrayValue<C>>;
 
     public constructor(
         controls: C[],
@@ -43,7 +31,27 @@ export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<
     }
 
     public get rawValue(): FormArrayRawValue<C> {
-        return this.getRawValue() as FormArrayRawValue<C>;
+        return this.getRawValue();
+    }
+
+    public override setValue(value: FormArrayRawValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
+        super.setValue(value, options);
+    }
+
+    public override at<K extends keyof C[] & number>(index: K): C {
+        return super.at(index) as C;
+    }
+
+    public override patchValue(value: FormArrayValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
+        super.patchValue(value, options);
+    }
+
+    public override reset(value?: FormArrayValue<C> | null, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
+        super.reset(value ?? undefined, options);
+    }
+
+    public override getRawValue(): FormArrayRawValue<C> {
+        return super.getRawValue();
     }
 
     public override set validator(validatorFn: ArrayValidatorFn<C> | null) {
@@ -62,19 +70,19 @@ export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<
         super.setAsyncValidators(validators);
     }
 
-    public override addValidators(validators: ArrayValidatorFn<C> | ArrayValidatorFn<C>[]) {
+    public override addValidators(...validators: ArrayValidatorFn<C>[]): void {
         super.addValidators(validators);
     }
 
-    public override addAsyncValidators(validators: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[]) {
+    public override addAsyncValidators(...validators: AsyncArrayValidatorFn<C>[]): void {
         super.addAsyncValidators(validators);
     }
 
-    public override removeValidators(validators: ArrayValidatorFn<C> | ArrayValidatorFn<C>[]) {
+    public override removeValidators(...validators: ArrayValidatorFn<C>[]): void {
         super.removeValidators(validators);
     }
 
-    public override removeAsyncValidators(validators: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[]) {
+    public override removeAsyncValidators(...validators: AsyncArrayValidatorFn<C>[]): void {
         super.removeAsyncValidators(validators);
     }
 

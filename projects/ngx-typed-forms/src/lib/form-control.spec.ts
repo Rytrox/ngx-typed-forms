@@ -1,10 +1,20 @@
 import {FormControl} from './form-control';
-import {Validators} from "@angular/forms";
+import {Validators, FormControl as AngularFormControl, FormControlDirective, FormsModule} from "@angular/forms";
+import {inject, TestBed} from "@angular/core/testing";
 
 describe('FormControl', () => {
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [FormsModule],
+            providers: [FormControlDirective]
+        })
+    })
+
     it('should create an unknown instance', () => {
         const form = new FormControl();
         expect(form).toBeInstanceOf(FormControl);
+        expect(form).toBeInstanceOf(AngularFormControl);
 
         expect(form.value).toBeFalsy();
         form.setValue('hello');
@@ -54,5 +64,9 @@ describe('FormControl', () => {
         expect(form.valid).toBeTrue();
     });
 
+    it('should be parsed inside a FormControlDirective', inject([FormControlDirective], (directive: FormControlDirective) => {
+        directive.form = new FormControl('Test');
 
+        expect(directive.form).toBeInstanceOf(FormControl);
+    }));
 });

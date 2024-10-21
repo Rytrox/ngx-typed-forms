@@ -21,9 +21,32 @@ type FormControlOptions<T> = AbstractControlOptions<T>;
 
 type Defined<T> = Exclude<T, undefined>;
 
-export interface FormControl<T> extends AbstractControl<T> {
+export interface FormControl<T> extends AngularFormControl<T>, AbstractControl<T, T> {
 
     rawValue: T;
+    asyncValidator: AsyncValidatorFn<T> | null;
+    validator: ValidatorFn<T> | null;
+
+    setValue(value: T, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+        emitModelToViewChange?: boolean;
+        emitViewToModelChange?: boolean;
+    }): void;
+
+    getRawValue(): T;
+
+    patchValue(value: T, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+        emitModelToViewChange?: boolean;
+        emitViewToModelChange?: boolean;
+    }): void;
+
+    reset(formState?: T | FormControlState<T>, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void;
 
     setValidators(validators: ValidatorFn<T> | ValidatorFn<T>[] | null): void;
 
@@ -43,7 +66,7 @@ export interface FormControl<T> extends AbstractControl<T> {
 }
 
 type IFormControl<T> = FormControl<T>;
-export const FormControl: FormControlConstructors = class FormControl<T = unknown> extends AngularFormControl implements IFormControl<T> {
+export const FormControl: FormControlConstructors = class FormControl<T = unknown> extends AngularFormControl implements IFormControl<T>, AbstractControl<T> {
 
     constructor(
         // formState and defaultValue will only be null if T is nullable
