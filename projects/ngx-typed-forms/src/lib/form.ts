@@ -19,6 +19,33 @@ export interface Form<T> {
     validators: ValidatorFn<this>[];
 
     /**
+     * Adds some validators to this form.
+     * You can't add the same validator twice, this will be ignored by its implementation.
+     *
+     * After adding, the form will be validated again
+     *
+     * @param validators the validators you want to add
+     */
+    addValidators(...validators: ValidatorFn<this>[]): void;
+
+    /**
+     * Removes some validators from this form.
+     * If you try to remove a validator that doesn't exist in this form, it will be ignored
+     *
+     * After removing, the form will be validated again
+     *
+     * @param validators the validators you want to remove
+     */
+    removeValidators(...validators: ValidatorFn<this>[]): void;
+
+    /**
+     * Checks if a validator exists inside this form
+     *
+     * @param validator the validator you want to check
+     */
+    hasValidator(validator: ValidatorFn<this>): boolean;
+
+    /**
      * Observable that holds the current status of the form
      */
     readonly status$: Observable<ValidationStatus>;
@@ -33,5 +60,15 @@ export interface Form<T> {
      */
     readonly valid: boolean;
 
+    /**
+     * The current value of errors.
+     * null is considered as VALID!
+     */
     readonly errors: ValidationErrors | null;
+
+    /**
+     * An Observable holding the current errors inside this form.
+     * null is considered as VALID
+     */
+    readonly errors$: Observable<ValidationErrors | null>;
 }
