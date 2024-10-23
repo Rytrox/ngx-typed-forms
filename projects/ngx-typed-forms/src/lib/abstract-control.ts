@@ -10,9 +10,7 @@ export interface AbstractControlOptions<T, R extends T = T> extends AngularAbstr
 }
 
 export declare type AbstractControlRawValue<T extends AbstractControl | undefined> =
-    T extends AngularAbstractControl<any, any> ?
-        T['setValue'] extends (v: infer R) => void ? R : never :
-        never;
+    T extends AbstractControl<any, any> ? T['rawValue'] : never;
 
 export declare type AbstractControlValue<T extends AbstractControl | undefined> =
     T extends AbstractControl<any, any> ? T['value'] : never;
