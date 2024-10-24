@@ -1,10 +1,10 @@
 import {
+    AsyncValidatorFn,
     FormControl as AngularFormControl,
     FormControlOptions as AngularFormControlOptions,
-    FormControlState as AngularFormControlState
+    FormControlState as AngularFormControlState, ValidatorFn
 } from "@angular/forms";
 import {AbstractControl, AbstractControlOptions} from "./abstract-control";
-import {AsyncValidatorFn, ValidatorFn} from "./validator";
 
 export interface FormControlState<T> {
     disabled?: boolean;
@@ -24,8 +24,8 @@ type Defined<T> = Exclude<T, undefined>;
 export interface FormControl<T> extends AngularFormControl<T>, AbstractControl<T, T> {
 
     rawValue: T;
-    asyncValidator: AsyncValidatorFn<T> | null;
-    validator: ValidatorFn<T> | null;
+    asyncValidator: AsyncValidatorFn | null;
+    validator: ValidatorFn | null;
 
     setValue(value: T, options?: {
         onlySelf?: boolean;
@@ -48,21 +48,21 @@ export interface FormControl<T> extends AngularFormControl<T>, AbstractControl<T
         emitEvent?: boolean;
     }): void;
 
-    setValidators(validators: ValidatorFn<T> | ValidatorFn<T>[] | null): void;
+    setValidators(validators: ValidatorFn | ValidatorFn[] | null): void;
 
-    setAsyncValidators(validators: AsyncValidatorFn<T> | AsyncValidatorFn<T>[] | null): void;
+    setAsyncValidators(validators: AsyncValidatorFn | AsyncValidatorFn[] | null): void;
 
-    addValidators(...validators: ValidatorFn<T>[]): void;
+    addValidators(...validators: ValidatorFn[]): void;
 
-    addAsyncValidators(...validators: AsyncValidatorFn<T>[]): void;
+    addAsyncValidators(...validators: AsyncValidatorFn[]): void;
 
-    removeValidators(...validators: ValidatorFn<T>[]): void;
+    removeValidators(...validators: ValidatorFn[]): void;
 
-    removeAsyncValidators(...validators: AsyncValidatorFn<T>[]): void;
+    removeAsyncValidators(...validators: AsyncValidatorFn[]): void;
 
-    hasValidator(validator: ValidatorFn<T>): boolean;
+    hasValidator(validator: ValidatorFn): boolean;
 
-    hasAsyncValidator(validator: AsyncValidatorFn<T>): boolean;
+    hasAsyncValidator(validator: AsyncValidatorFn): boolean;
 }
 
 type IFormControl<T> = FormControl<T>;

@@ -1,24 +1,24 @@
 import {Validators} from '@angular/forms';
 import {FormControl} from "./form-control";
-import {FormGroup, FormGroupValue} from "./form-group";
+import {FormGroup} from "./form-group";
 import {FormArray} from "./form-array";
 
 interface Foo {
-    name: FormControl<string | null>,
-    id: FormControl<number | null>,
-    date: FormControl<Date | null>,
-    bar?: BarGroup
+    name: string | null,
+    id: number | null,
+    date: Date | null,
+    bar?: Bar
 }
 
 interface Bar {
-    parent: FormControl<string | null>;
+    parent: string;
 }
 
 class BarGroup extends FormGroup<Bar> {
 
-    constructor(original?: FormGroupValue<Bar>) {
+    constructor(original?: Bar) {
         super({
-            parent: new FormControl(original?.parent)
+            parent: new FormControl({value: original?.parent ?? '', nonNullable: true}),
         });
     }
 
@@ -26,7 +26,7 @@ class BarGroup extends FormGroup<Bar> {
 
 class FooGroup extends FormGroup<Foo> {
 
-    constructor(original: FormGroupValue<Foo>) {
+    constructor(original: Foo) {
         super({
             name: new FormControl(original.name, { validators: [ Validators.required ] }),
             id: new FormControl(original.id),
@@ -38,7 +38,9 @@ class FooGroup extends FormGroup<Foo> {
 
 describe('FormArray', () => {
     it('should create an instance', () => {
-        const form = new FormArray<FooGroup>([]);
+        const form = new FormArray<FooGroup>([
+
+        ]);
         expect(form).toBeTruthy();
 
         // const val = form.value;

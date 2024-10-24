@@ -1,96 +1,92 @@
 import {
     FormArray as AngularFormArray,
-    AbstractControlOptions as AngularAbstractControlOptions
+    AbstractControlOptions, ValidatorFn, AsyncValidatorFn
 } from "@angular/forms";
-import {ArrayValidatorFn, AsyncArrayValidatorFn} from "./validator";
-import {AbstractControl, AbstractControlRawValue, AbstractControlValue} from "./abstract-control";
+import {AbstractControl} from "./abstract-control";
 import {Observable} from "rxjs";
 
-export type FormArrayValue<C extends AbstractControl<any>> = AbstractControlValue<C>[];
+type CFormValue<C extends AbstractControl<any> | undefined> =
+    C extends AbstractControl<any, any> ? C['value'][] : never;
 
-export type FormArrayRawValue<C extends AbstractControl<any>> = AbstractControlRawValue<C>[];
 
-export interface FormArrayControlType<C extends AbstractControl<any>> extends AngularAbstractControlOptions {
-    validators?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | null;
-    asyncValidators?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null;
-}
+type CFormRawValue<C extends AbstractControl<any> | undefined> =
+    C extends AbstractControl<any, any> ? C['rawValue'] : never;
 
-// @ts-expect-error This is correct, because Array<V> does not extend Array<R>, but this needs to work here, since Angular is designed to do this.
-export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<C> implements AbstractControl<FormArrayValue<C>, FormArrayRawValue<C>> {
+export class FormArray<C extends AbstractControl<any, any>> extends AngularFormArray<C> implements AbstractControl<CFormValue<C>[], CFormRawValue<C>[]> {
 
     public declare readonly controls: C[];
-    public declare readonly value: FormArrayValue<C>;
-    public declare readonly valueChanges: Observable<FormArrayValue<C>>;
+    public declare readonly value: CFormValue<C>;
+    public declare readonly valueChanges: Observable<CFormValue<C>>;
 
     public constructor(
         controls: C[],
-        validatorOrOpts?: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | FormArrayControlType<C> | null,
-        asyncValidator?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null
+        validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null,
+        asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null
     ) {
         super(controls, validatorOrOpts, asyncValidator);
     }
 
-    public get rawValue(): FormArrayRawValue<C> {
+    public get rawValue(): CFormRawValue<C> {
         return this.getRawValue();
     }
 
-    public override setValue(value: FormArrayRawValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        super.setValue(value, options);
+    public override setValue(value: CFormRawValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
+        super.setValue(value as any, options);
     }
 
     public override at<K extends keyof C[] & number>(index: K): C {
         return super.at(index) as C;
     }
 
-    public override patchValue(value: FormArrayValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
+    public override patchValue(value: CFormValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
         super.patchValue(value, options);
     }
 
-    public override reset(value?: FormArrayValue<C> | null, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
+    public override reset(value?: CFormValue<C>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
         super.reset(value ?? undefined, options);
     }
 
-    public override getRawValue(): FormArrayRawValue<C> {
-        return super.getRawValue();
+    public override getRawValue(): CFormRawValue<C> {
+        return super.getRawValue() as CFormRawValue<C>;
     }
 
-    public override set validator(validatorFn: ArrayValidatorFn<C> | null) {
+    public override set validator(validatorFn: ValidatorFn | null) {
         super.validator = validatorFn;
     }
 
-    public override set asyncValidator(asyncValidatorFn: AsyncArrayValidatorFn<C> | null) {
+    public override set asyncValidator(asyncValidatorFn: AsyncValidatorFn | null) {
         super.asyncValidator = asyncValidatorFn;
     }
 
-    public override setValidators(validators: ArrayValidatorFn<C> | ArrayValidatorFn<C>[] | null) {
+    public override setValidators(validators: ValidatorFn | ValidatorFn[] | null): void {
         super.setValidators(validators);
     }
 
-    public override setAsyncValidators(validators: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null) {
+    public override setAsyncValidators(validators: AsyncValidatorFn | AsyncValidatorFn[] | null): void {
         super.setAsyncValidators(validators);
     }
 
-    public override addValidators(...validators: ArrayValidatorFn<C>[]): void {
+    public override addValidators(...validators: ValidatorFn[]): void {
         super.addValidators(validators);
     }
 
-    public override addAsyncValidators(...validators: AsyncArrayValidatorFn<C>[]): void {
+    public override addAsyncValidators(...validators: AsyncValidatorFn[]): void {
         super.addAsyncValidators(validators);
     }
 
-    public override removeValidators(...validators: ArrayValidatorFn<C>[]): void {
+    public override removeValidators(...validators: ValidatorFn[]): void {
         super.removeValidators(validators);
     }
 
-    public override removeAsyncValidators(...validators: AsyncArrayValidatorFn<C>[]): void {
+    public override removeAsyncValidators(...validators: AsyncValidatorFn[]): void {
         super.removeAsyncValidators(validators);
     }
 
-    public override hasValidator(validator: ArrayValidatorFn<C>): boolean {
+    public override hasValidator(validator: ValidatorFn): boolean {
         return super.hasValidator(validator);
     }
 
-    public override hasAsyncValidator(validator: AsyncArrayValidatorFn<C>): boolean {
+    public override hasAsyncValidator(validator: AsyncValidatorFn): boolean {
         return super.hasAsyncValidator(validator);
     }
 }

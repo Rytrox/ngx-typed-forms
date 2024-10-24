@@ -29,29 +29,20 @@ yarn add @rytrox/ngx-typed-forms
 
 | Angular Version | Library Version |
 |:---------------:|:---------------:|
-|     ^18.2.0     |     ^1.0.0      |
+|     ^18.2.0     |     ^2.0.0      |
 
 
 ## Usage
 
-### Creating your FormGroup-Interface
+### Creating your Interface
 
-Instead of having a `Model`-interface, define a `FormGroup`-interface like this:
+Define your Interface like this:
 
 ```ts
-// this interface can now be removed entirely, since it is no longer necessary:
-// This is equivalent to "FormGroupRawValue<Foo>"
-interface FooModel {
-    name: string | null;
-    id: number | null;
-    date: Date | null
-}
-
-// This is our new Interface
 interface Foo {
-    name: FormControl<string | null>;
-    id: FormControl<number | null>;
-    date: FormControl<Date | null>;
+    id: number;
+    name: string | null;
+    date: Date | null
 }
 ```
 Only controls that are declared as optional (by using the `?` operator), are allowed to be registered or removed from the form group.
@@ -60,54 +51,20 @@ Only controls that are declared as optional (by using the `?` operator), are all
 After you've defined your `FormGroup`-interface like above, you can implement a custom `FormGroup` like this:
 
 ```ts
-import {FormGroup, FormControl, FormGroupValue} from "@rytrox/ngx-typed-forms";
+import {FormGroup, FormControl} from "@rytrox/ngx-typed-forms";
 
 export class FooGroup extends FormGroup<Foo> {
 
-    public constructor(private input: FormGroupValue<Foo>) {
+    public constructor(private input: Foo) {
         super({
+            id: new FormControl({value: input.id, nonNullable: true}),
             name: new FormControl(input.name),
-            id: new FormControl(input.id),
             date: new FormControl(input.date),
         });
     }
 }
 ```
 Notice that the name of the form-related classes are the same as angular's native ones.
-
-### Raw Values, Values for FormGroups
-
-There are four new types for `FormGroup` and `FormArrays`: <br>
-`FormGroupValue<C>` or `FormArrayValue<C>` and `FormGroupRawValue<C>` or `FormArrayRawValue<C>`.
-
-Those types represent the current value or raw value of your form. 
-In most cases your model now is a `FormGroupValue<C>` or `FormGroupRawValue<C>`.
-
-The difference between `FormGroupValue` and `FormGroupRawValue` 
-is that `FormGroupValue` hides properties of disabled sub-forms, 
-while `FormGroupRawValue` doesn't.
-
-### Strong-typed Validators
-Validators inside this Library are now strongly typed by default. 
-Every `Form` inside this Library only supports Validators based on their `FormValue`.
-
-For example:
-
-```ts
-import {FormControl, AbstractControl} from "@rytrox/ngx-typed-forms";
-
-const form = new FormControl('Hello'); // This is a FormControl<string | null>
-
-// This is not allowed!!
-form.addValidators((c: AbstractControll<number | null>) => { 
-    ...
-});
-
-// Instead, we are using this:
-form.addValidators(c => {
-    const val = c.value; // type is string | null
-})
-```
 
 ### A new fresh look to FormControls
 Over the past years, the famous `FormControl` is pretty stuffed with confusing APIs. 
@@ -129,7 +86,7 @@ To:
 import {FormControl} from "@rytrox/ngx-typed-forms";
 import {Validators} from "@angular/forms";
 
-const form = new FormControl('Hello', {validators: [Validators.required()], asyncValidators: []});
+const form = new FormControl('Hello', {validators: [Validators.required()], asyncValidators: [ /* Async-Validators here */ ]});
 ```
 
 ### Non-Nullable Angular FormControls
@@ -178,7 +135,8 @@ You are now able to use the internal Angular-Type `OptionalKeys<T>` that returns
    ```
 4. We introduced in every form a new field called `rawValue`.
    It returns the raw value of every form. 
-   It's just an alternative to the `getRawValue()` method 
+   It's just an alternative to the `getRawValue()` method.
+
 ## Contributing
 
 Please feel free to contribute to this project  

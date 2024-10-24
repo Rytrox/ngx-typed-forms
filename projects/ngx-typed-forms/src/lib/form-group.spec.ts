@@ -1,23 +1,23 @@
-import {FormGroup, FormGroupValue} from './form-group';
+import {FormGroup} from './form-group';
 import {FormControl} from "./form-control";
-import {Validators} from "@angular/forms";
+import {ValidatorFn, Validators} from "@angular/forms";
 
 interface Foo {
-    name: FormControl<string | null>,
-    id: FormControl<number | null>,
-    date: FormControl<Date | null>,
-    bar?: BarGroup
+    name: string | null,
+    id: number | null,
+    date: Date | null,
+    bar?: Bar
 }
 
 interface Bar {
-    parent: FormControl<string | null>;
+    parent: string;
 }
 
 class BarGroup extends FormGroup<Bar> {
 
-    constructor(original?: FormGroupValue<Bar>) {
+    constructor(original?: Bar) {
         super({
-            parent: new FormControl(original?.parent),
+            parent: new FormControl({value: original?.parent ?? '', nonNullable: true}),
         });
     }
 
@@ -25,7 +25,7 @@ class BarGroup extends FormGroup<Bar> {
 
 class FooGroup extends FormGroup<Foo> {
 
-    constructor(original: FormGroupValue<Foo>) {
+    constructor(original: Foo) {
         super({
             name: new FormControl(original.name, { validators: [ Validators.required ] }),
             id: new FormControl(original.id),
@@ -99,4 +99,20 @@ describe('JuniorJobFormGroup', () => {
 
         group.registerControl('bar', new BarGroup({parent: 'Hello'}));
     });
+
+    it('should register validators', () => {
+        const validator: ValidatorFn = (control) => {
+            return control.value ? {required: 'Dies ist ein Pflichtfeld'} : null;
+        }
+
+        const group = new FooGroup({
+            id: 1,
+            name: 'Test',
+            date: new Date(),
+            bar: { parent: 'Hello' }
+        });
+
+        group.addValidators();
+        expect(group.hasValidator(validator)).toBeTruthy();
+    })
 });
