@@ -1,10 +1,10 @@
 import {
     AsyncValidatorFn,
-    FormControl as AngularFormControl,
+    FormControl as AngularFormControl, FormControlOptions,
     FormControlOptions as AngularFormControlOptions,
     FormControlState as AngularFormControlState, ValidatorFn
 } from "@angular/forms";
-import {AbstractControl, AbstractControlOptions} from "./abstract-control";
+import {AbstractControl} from "./abstract-control";
 
 export interface FormControlState<T> {
     disabled?: boolean;
@@ -16,8 +16,6 @@ export interface NonNullableFormControlState<T> {
     nonNullable: true;
     value: Defined<T>;
 }
-
-type FormControlOptions<T> = AbstractControlOptions<T>;
 
 type Defined<T> = Exclude<T, undefined>;
 
@@ -71,7 +69,7 @@ export const FormControl: FormControlConstructors = class FormControl<T = unknow
     constructor(
         // formState and defaultValue will only be null if T is nullable
         formState: FormControlState<T> | T = null as T,
-        opts?: FormControlOptions<T> | null,
+        opts?: FormControlOptions | null,
     ) {
         super(convertState(formState), convertOpts(formState, opts));
     }
@@ -95,7 +93,7 @@ const convertState = <T> (state: FormControlState<T> | T): AngularFormControlSta
     };
 }
 
-const convertOpts = <T> (state: FormControlState<T> | T, options: FormControlOptions<T> | undefined | null): AngularFormControlOptions | undefined | null => {
+const convertOpts = <T> (state: FormControlState<T> | T, options: FormControlOptions | undefined | null): AngularFormControlOptions | undefined | null => {
     // check for non-nullable and move it back
     if (!!state && typeof state === 'object' && 'nonNullable' in state && typeof state.nonNullable === 'boolean') {
         return {
@@ -132,7 +130,7 @@ declare interface FormControlConstructors {
      */
     new <T extends Defined<any> = Defined<unknown>>(
         state: NonNullableFormControlState<T>,
-        options?: FormControlOptions<NonNullable<T>>
+        options?: FormControlOptions
     ): FormControl<NonNullable<T>>;
 
     /**
@@ -148,7 +146,7 @@ declare interface FormControlConstructors {
      */
     new <T extends Defined<any> = Defined<unknown>>(
         state: FormControlState<T | null> | T | undefined,
-        options?: FormControlOptions<Defined<T> | null>
+        options?: FormControlOptions
     ): FormControl<Defined<T> | null>;
 
 
