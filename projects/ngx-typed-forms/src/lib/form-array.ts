@@ -15,7 +15,6 @@ export interface FormArrayControlType<C extends AbstractControl<any>> extends An
     asyncValidators?: AsyncArrayValidatorFn<C> | AsyncArrayValidatorFn<C>[] | null;
 }
 
-// @ts-expect-error This is correct, because Array<V> does not extend Array<R>, but this needs to work here, since Angular is designed to do this.
 export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<C> implements AbstractControl<FormArrayValue<C>, FormArrayRawValue<C>> {
 
     public declare readonly controls: C[];
@@ -51,7 +50,7 @@ export class FormArray<C extends AbstractControl<any>> extends AngularFormArray<
     }
 
     public override getRawValue(): FormArrayRawValue<C> {
-        return super.getRawValue();
+        return super.getRawValue() as FormArrayRawValue<C>;
     }
 
     public override set validator(validatorFn: ArrayValidatorFn<C> | null) {

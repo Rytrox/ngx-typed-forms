@@ -6,3 +6,4 @@ export * from './lib/abstract-control';
 export * from './lib/validator';
 export * from './lib/form-control';
 export * from './lib/form-group';
+export * from './lib/form-array';
