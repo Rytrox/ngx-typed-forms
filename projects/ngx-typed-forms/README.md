@@ -29,7 +29,8 @@ yarn add @rytrox/ngx-typed-forms
 
 | Angular Version | Library Version |
 |:---------------:|:---------------:|
-|     ^18.2.0     |     ^2.0.0      |
+|     ^18.2.0     |  1.0.0 - 2.0.1  |
+|     ^19.0.0     |     ^2.1.0      |
 
 
 ## Usage

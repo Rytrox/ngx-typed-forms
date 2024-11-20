@@ -1,6 +1,6 @@
 {
     "name": "@rytrox/ngx-typed-forms",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "peerDependencies": {
         "@angular/common": "^18.2.0",
         "@angular/core": "^18.2.0",
@@ -18,9 +18,11 @@
     "keywords": [
         "angular",
         "angular18",
+        "angular19",
         "forms",
         "ng",
         "ng18",
+        "ng19",
         "ngx",
         "type",
         "strict"
