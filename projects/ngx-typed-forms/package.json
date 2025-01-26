@@ -1,6 +1,6 @@
 {
     "name": "@rytrox/ngx-typed-forms",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "peerDependencies": {
         "@angular/common": "^19.0.0",
         "@angular/core": "^19.0.0",

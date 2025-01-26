@@ -10,7 +10,7 @@ type CFormValue<C extends AbstractControl<any> | undefined> =
 
 
 type CFormRawValue<C extends AbstractControl<any> | undefined> =
-    C extends AbstractControl<any, any> ? C['rawValue'] : never;
+    C extends AbstractControl<any, any> ? C['rawValue'][] : never;
 
 export class FormArray<C extends AbstractControl<any, any>> extends AngularFormArray<C> implements AbstractControl<CFormValue<C>[], CFormRawValue<C>[]> {
 
