@@ -1,117 +1,84 @@
 import {Form} from "./form";
-import {ValidationErrors, ValidationStatus, ValidatorFn} from "./validator";
-import {BehaviorSubject, forkJoin, isObservable, map, Observable, of, take} from "rxjs";
+import {ValidationErrors, ValidatorFn} from "./validator";
+import {computed, Signal, signal, WritableSignal} from "@angular/core";
 
-export class SimpleForm<T> implements Form<T> {
+interface SimpleFormOptions<T> {
+    value: T;
+    disabled?: boolean;
+    validators?: ValidatorFn<T>[];
+}
 
-    private readonly _status$ = new BehaviorSubject<ValidationStatus>(ValidationStatus.PENDING);
-    private readonly _errors$ = new BehaviorSubject<ValidationErrors | null>(null);
-    private readonly _value$: BehaviorSubject<T>;
+const isSimpleFormOptions = <T> (val: T | SimpleFormOptions<T>): val is SimpleFormOptions<T> => {
+    return !!val && typeof val === 'object' &&
+        'value' in val &&
+        (!('disabled' in val) || typeof val.disabled === 'boolean') &&
+        (!('validators' in val) || Array.isArray(val));
+}
 
-    private _validators: Set<ValidatorFn<this>>;
+export function form<T>(val: T | SimpleFormOptions<T>): Form<T> {
+    return new SimpleForm<T>(val);
+}
 
-    public constructor(defaultValue: T, ...validators: ValidatorFn<SimpleForm<T>>[]) {
-        this._validators = new Set<ValidatorFn<this>>(validators ?? []);
+class SimpleForm<T> implements Form<T> {
 
-        this._value$ = new BehaviorSubject(defaultValue);
-        this.performValidation();
-    }
+    private readonly _validators: WritableSignal<Set<ValidatorFn<T>>>;
 
-    private performValidation(): void {
-        this._status$.next(ValidationStatus.PENDING);
-        this.createErrorObservable().subscribe(errors => {
-            this._errors$.next(errors);
+    public readonly value: WritableSignal<T>;
+    public readonly disabled: WritableSignal<boolean>;
+    public readonly errors: Signal<ValidationErrors | null>;
 
-            if (errors) {
-                this._status$.next(ValidationStatus.INVALID);
-            } else {
-                this._status$.next(ValidationStatus.VALID);
-            }
+    public constructor(defaultOrOptions: T | SimpleFormOptions<T>) {
+        let disabled: boolean;
+        let value: T;
+        let validators: ValidatorFn<T>[] = [];
+
+        if (isSimpleFormOptions(defaultOrOptions)) {
+            disabled = defaultOrOptions.disabled ?? false;
+            value = defaultOrOptions.value;
+            validators = defaultOrOptions.validators ?? [];
+        } else {
+            value = defaultOrOptions;
+            disabled = false;
+        }
+
+        this._validators = signal(new Set<ValidatorFn<T>>(validators));
+        this.disabled = signal(disabled);
+
+        this.value = signal(value);
+        this.errors = computed(() => {
+            const validators = this._validators();
+            const value = this.value();
+
+            const errors = [...validators].map(validator => validator(value))
+                .filter((error): error is ValidationErrors => !!error);
+
+            return errors.length > 0 ?
+                errors.reduce((error, current) => Object.assign(error, current), {}) :
+                null;
         });
     }
 
-    private createErrorObservable(): Observable<ValidationErrors | null> {
-        // If no validator, everything is considered as valid
-        if (this._validators.size === 0) {
-            return of(null);
-        }
-
-        return forkJoin(
-            [...this._validators].map(validator => {
-                const result = validator(this);
-                if (isObservable(result)) {
-                    // Important! I just need one result, not every result...
-                    return result.pipe(take(1));
-                }
-
-                return of(result);
-            })
-        ).pipe(
-            map(results => {
-                const errors = results.filter(result => !!result);
-                if (errors.length > 0) {
-                    return errors.reduce((error, current) => Object.assign(error, current), {});
-                }
-
-                return null;
-            }),
-        );
+    public get validators(): Signal<ValidatorFn<T>[]> {
+        return computed(() => [...this._validators()]);
     }
 
-    public get status(): ValidationStatus {
-        return this._status$.value;
+    public addValidators(...validators: ValidatorFn<T>[]): void {
+        const set = this._validators();
+        validators.forEach(validator => set.add(validator));
+
+        this._validators.set(set);
     }
 
-    public get status$(): Observable<ValidationStatus> {
-        return this._status$.asObservable();
+    public hasValidator(validator: ValidatorFn<T>): boolean {
+        const set = this._validators();
+
+        return set.has(validator);
     }
 
-    public get value(): T {
-        return this._value$.value;
-    }
+    public removeValidators(...validators: ValidatorFn<T>[]): void {
+        const set = this._validators();
+        validators.forEach(validator => set.delete(validator));
 
-    public set value(val: T) {
-        this._value$.next(val);
-        this.performValidation();
-    }
-
-    public get value$(): Observable<T> {
-        return this._value$.asObservable();
-    }
-
-    public get valid(): boolean {
-        return this._status$.value === ValidationStatus.VALID;
-    }
-
-    public get validators(): ValidatorFn<this>[] {
-        return [...this._validators];
-    }
-
-    public set validators(value: ValidatorFn<this>[]) {
-        this._validators = new Set(value);
-    }
-
-    public addValidators(...validators: ValidatorFn<this>[]): void {
-        validators.forEach(validator => this._validators.add(validator));
-
-        this.performValidation();
-    }
-
-    public hasValidator(validator: ValidatorFn<this>): boolean {
-        return this._validators.has(validator);
-    }
-
-    public removeValidators(...validators: ValidatorFn<this>[]): void {
-        validators.forEach(validator => this._validators.delete(validator));
-
-        this.performValidation();
-    }
-
-    public get errors(): ValidationErrors | null {
-        return this._errors$.value;
-    }
-
-    public get errors$(): Observable<ValidationErrors | null> {
-        return this._errors$.asObservable();
+        this._validators.set(set);
     }
 }
