@@ -27,7 +27,7 @@ class FooGroup extends FormGroup<Foo> {
 
     constructor(original: Foo) {
         super({
-            name: new FormControl(original.name, { validators: [ Validators.required ] }),
+            name: new FormControl({value: original.name, validators: [ Validators.required ] }),
             id: new FormControl(original.id),
             date: new FormControl(original.date),
             bar: new BarGroup(original.bar)
@@ -112,7 +112,7 @@ describe('JuniorJobFormGroup', () => {
             bar: { parent: 'Hello' }
         });
 
-        group.addValidators();
+        group.addValidators(validator);
         expect(group.hasValidator(validator)).toBeTruthy();
     })
 });

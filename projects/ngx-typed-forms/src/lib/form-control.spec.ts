@@ -55,7 +55,7 @@ describe('FormControl', () => {
     })
 
     it('should validate correctly', () => {
-        const form = new FormControl<string | null>(null, { validators: [ Validators.required ] });
+        const form = new FormControl<string | null>({value: null, validators: [ Validators.required ] });
         expect(form.value).toBeFalsy();
         expect(form.valid).toBeFalse();
 

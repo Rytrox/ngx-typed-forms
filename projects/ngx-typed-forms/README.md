@@ -30,7 +30,8 @@ yarn add @rytrox/ngx-typed-forms
 | Angular Version | Library Version |
 |:---------------:|:---------------:|
 |     ^18.2.0     |  1.0.0 - 2.0.1  |
-|     ^19.0.0     |     ^2.1.1      |
+|     ^19.0.0     |  2.1.1 - 2.1.2  |
+|     ^19.2.0     |     ^2.2.0      |
 
 
 ## Usage
@@ -87,7 +88,7 @@ To:
 import {FormControl} from "@rytrox/ngx-typed-forms";
 import {Validators} from "@angular/forms";
 
-const form = new FormControl('Hello', {validators: [Validators.required()], asyncValidators: [ /* Async-Validators here */ ]});
+const form = new FormControl({value: 'Hello', validators: [Validators.required()], asyncValidators: [ /* Async-Validators here */ ]});
 ```
 
 ### Non-Nullable Angular FormControls
@@ -106,7 +107,7 @@ To:
 ```ts
 import {FormControl} from "@rytrox/ngx-typed-forms";
 
-const form = new FormControl({value: 'Hello', nonNullable: true}, {validators: [], asyncValidators: []});
+const form = new FormControl({value: 'Hello', nonNullable: true, validators: [], asyncValidators: []});
 ```
 
 ### A nice gimmick

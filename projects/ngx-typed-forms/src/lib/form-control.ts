@@ -9,10 +9,12 @@ import {AbstractControl} from "./abstract-control";
 export interface FormControlState<T> {
     disabled?: boolean;
     value: T;
+    validators?: ValidatorFn[];
+    asyncValidators?: AsyncValidatorFn[];
+    updateOn?: 'change' | 'blur' | 'submit'
 }
 
-export interface NonNullableFormControlState<T> {
-    disabled?: boolean;
+export interface NonNullableFormControlState<T> extends FormControlState<T> {
     nonNullable: true;
     value: Defined<T>;
 }
@@ -68,10 +70,9 @@ export const FormControl: FormControlConstructors = class FormControl<T = unknow
 
     constructor(
         // formState and defaultValue will only be null if T is nullable
-        formState: FormControlState<T> | T = null as T,
-        opts?: FormControlOptions | null,
+        formState: FormControlState<T> | NonNullableFormControlState<T> | T = null as T
     ) {
-        super(convertState(formState), convertOpts(formState, opts));
+        super(convertState(formState), convertOpts(formState));
     }
 
     public get rawValue(): T {
@@ -93,16 +94,26 @@ const convertState = <T> (state: FormControlState<T> | T): AngularFormControlSta
     };
 }
 
-const convertOpts = <T> (state: FormControlState<T> | T, options: FormControlOptions | undefined | null): AngularFormControlOptions | undefined | null => {
+const convertOpts = <T> (state: FormControlState<T> | NonNullableFormControlState<T> | T): AngularFormControlOptions | undefined | null => {
     // check for non-nullable and move it back
-    if (!!state && typeof state === 'object' && 'nonNullable' in state && typeof state.nonNullable === 'boolean') {
+    if (isFormControlState(state)) {
+        if ('nonNullable' in state) {
+            return {
+                updateOn: state.updateOn,
+                validators: state.validators,
+                asyncValidators: state.asyncValidators,
+                nonNullable: state.nonNullable
+            };
+        }
+
         return {
-            ...options,
-            nonNullable: state.nonNullable
+            updateOn: state.updateOn,
+            validators: state.validators,
+            asyncValidators: state.asyncValidators
         };
     }
 
-    return options;
+    return undefined;
 }
 
 const isFormControlState = <T> (val: FormControlState<T> | T): val is FormControlState<T> => {
@@ -122,15 +133,13 @@ declare interface FormControlConstructors {
      *
      * @param state Initializes the control with an initial value,
      * or an object that defines the initial value and disabled state.
-     *
-     * @param options A synchronous validator function, or an array of
+     * This object includes a synchronous validator function, or an array of
      * such functions, or a `FormControlOptions` object that contains validation functions
      * and a validation trigger.
      *
      */
     new <T extends Defined<any> = Defined<unknown>>(
-        state: NonNullableFormControlState<T>,
-        options?: FormControlOptions
+        state: NonNullableFormControlState<T>
     ): FormControl<NonNullable<T>>;
 
     /**
@@ -138,15 +147,13 @@ declare interface FormControlConstructors {
      *
      * @param state Initializes the control with an initial value,
      * or an object that defines the initial value and disabled state.
-     *
-     * @param options A synchronous validator function, or an array of
+     * This object includes a synchronous validator function, or an array of
      * such functions, or a `FormControlOptions` object that contains validation functions
      * and a validation trigger.
      *
      */
     new <T extends Defined<any> = Defined<unknown>>(
         state: FormControlState<T | null> | T | undefined,
-        options?: FormControlOptions
     ): FormControl<Defined<T> | null>;
 
 
