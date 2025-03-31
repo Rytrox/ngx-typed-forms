@@ -1,6 +1,6 @@
 import {
     AsyncValidatorFn,
-    FormControl as AngularFormControl, FormControlOptions,
+    FormControl as AngularFormControl,
     FormControlOptions as AngularFormControlOptions,
     FormControlState as AngularFormControlState, ValidatorFn
 } from "@angular/forms";
